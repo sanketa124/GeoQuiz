@@ -3,6 +3,7 @@ package com.bignerdranch.androidgeoquiz
 import android.content.Context
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
@@ -29,9 +30,13 @@ class MainActivity : AppCompatActivity() {
     )
 
     private var currentIndex = 0
+    private var currentScore = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Log.d(Companion.TAG, "onCreate(Bundle?) called")
+
         //setContentView(R.layout.activity_main)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -43,23 +48,39 @@ class MainActivity : AppCompatActivity() {
 
         binding.trueButton.setOnClickListener{
             //Toast.makeText(this, R.string.correct_toast, Toast.LENGTH_SHORT).show()
+            updateScore(true)
             checkAnswer(true)
+            binding.trueButton.isEnabled = false
+            binding.falseButton.isEnabled = false
         }
 
         binding.falseButton.setOnClickListener{
+            updateScore(false)
             checkAnswer(false)
+            binding.trueButton.isEnabled = false
+            binding.falseButton.isEnabled = false
             //val snackbar = Snackbar.make(coordinator, "Did Something", Snackbar.LENGTH_LONG)
             //snackbar.show()
             //Toast.makeText(this, R.string.incorrect_toast, Toast.LENGTH_SHORT).show()
         }
 
         binding.nextButton.setOnClickListener{
+            binding.trueButton.isEnabled = true
+            binding.falseButton.isEnabled = true
+            if(currentIndex == questionBank.size - 1) {
+                val currentPercentage = String.format("%.3f", ((currentScore.toDouble()/6) * 100.0)).toDouble()
+                Toast.makeText(this, "The Total Percentage Score is $currentPercentage%", Toast.LENGTH_SHORT).show()
+                currentScore = 0
+            }
             currentIndex = (currentIndex + 1) % questionBank.size
             updateQuestion()
         }
 
         binding.previousButton.setOnClickListener{
+            binding.trueButton.isEnabled = true
+            binding.falseButton.isEnabled = true
             if(currentIndex == 0) {
+                currentScore = 0
                 currentIndex = questionBank.size
             }
             currentIndex = (currentIndex - 1) % questionBank.size
@@ -67,6 +88,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.questionTextView.setOnClickListener{
+            binding.trueButton.isEnabled = true
+            binding.falseButton.isEnabled = true
+            if(currentIndex == questionBank.size - 1) {
+                val currentPercentage = String.format("%.3f", ((currentScore.toDouble()/6) * 100.0)).toDouble()
+                Toast.makeText(this, "The Total Percentage Score is $currentPercentage%", Toast.LENGTH_SHORT).show()
+                currentScore = 0
+            }
             currentIndex = (currentIndex + 1) % questionBank.size
             updateQuestion()
         }
@@ -75,9 +103,45 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onStart(){
+        super.onStart()
+        Log.d(Companion.TAG, "onStart(Bundle?) called")
+    }
+
+    override fun onResume(){
+        super.onResume()
+        Log.d(Companion.TAG, "onResume(Bundle?) called")
+    }
+
+    override fun onPause(){
+        super.onPause()
+        Log.d(Companion.TAG, "onPause(Bundle?) called")
+    }
+
+    override fun onStop(){
+        super.onStop()
+        Log.d(Companion.TAG, "onStop(Bundle?) called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(Companion.TAG, "onDestroy(Bundle?) called")
+    }
+
     private fun updateQuestion(){
         val questionTextResId = questionBank[currentIndex].textResId
         binding.questionTextView.setText(questionTextResId)
+    }
+
+    private fun updateScore(userAnswer: Boolean){
+        val correctAnswer = questionBank[currentIndex].answer
+
+        val messageResId = if(userAnswer == correctAnswer) {
+            currentScore += 1
+        }else{
+
+        }
+
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
@@ -91,6 +155,10 @@ class MainActivity : AppCompatActivity() {
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
 
+    }
+
+    companion object {
+        private const val TAG = "MainActivity"
     }
 
 }
