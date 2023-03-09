@@ -6,11 +6,7 @@ This app is a general quiz app that prompts user with GK questions. It has been 
 
 
 
-## Features
-- Event Listeners.
-- Data Binding.
-- Navigation Drawers.
-- Icons support inbuilt.
+
 ## Features
 - Event Listeners.
 - Data Binding.
