@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.snackbar.Snackbar
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var coordinator: CoordinatorLayout
 
     private lateinit var binding: ActivityMainBinding
+    private val quizViewModel: QuizViewModel by viewModels()
 
     private val questionBank = listOf(
         Question(R.string.question_australia, true),
@@ -41,6 +43,8 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        Log.d(TAG, "Gor a QuizViewModel: $quizViewModel")
 
         trueButton = findViewById<Button>(R.id.true_button)
         falseButton = findViewById<Button>(R.id.false_button)
@@ -72,7 +76,8 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "The Total Percentage Score is $currentPercentage%", Toast.LENGTH_SHORT).show()
                 currentScore = 0
             }
-            currentIndex = (currentIndex + 1) % questionBank.size
+            //currentIndex = (currentIndex + 1) % questionBank.size
+            quizViewModel.moveToNext()
             updateQuestion()
         }
 
@@ -95,7 +100,8 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "The Total Percentage Score is $currentPercentage%", Toast.LENGTH_SHORT).show()
                 currentScore = 0
             }
-            currentIndex = (currentIndex + 1) % questionBank.size
+            //currentIndex = (currentIndex + 1) % questionBank.size
+            quizViewModel.moveToNext()
             updateQuestion()
         }
 
@@ -129,7 +135,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateQuestion(){
-        val questionTextResId = questionBank[currentIndex].textResId
+        //val questionTextResId = questionBank[currentIndex].textResId
+        val questionTextResId = quizViewModel.currentQuestionText
         binding.questionTextView.setText(questionTextResId)
     }
 
@@ -145,7 +152,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
-        val correctAnswer = questionBank[currentIndex].answer
+        //val correctAnswer = questionBank[currentIndex].answer
+        val correctAnswer = quizViewModel.currentQuestionAnswer
 
         val messageResId = if(userAnswer == correctAnswer) {
             R.string.correct_toast
